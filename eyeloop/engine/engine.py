@@ -131,6 +131,7 @@ class Engine:
         to infer blinking. Change in mean during blinking is very distinct.
         :returns: True if blink detected, False otherwise
         """
+        return False
         # TODO calculate threshold using another method?
         if threshold is None:
             threshold = self.blink_threshold
