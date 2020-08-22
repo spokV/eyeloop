@@ -18,7 +18,6 @@ PROJECT_DIR = EYELOOP_DIR.parent
 
 logger = logging.getLogger(__name__)
 
-
 class EyeLoop:
     """
     EyeLoop is a Python 3-based eye-tracker tailored specifically to dynamic, closed-loop experiments on consumer-grade hardware.
