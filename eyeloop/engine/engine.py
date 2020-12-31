@@ -20,6 +20,14 @@ class Engine:
         self.eyeloop = eyeloop
         self.model = config.arguments.model  # Used for assigning appropriate circular model.
 
+        self.blink_threshold = config.arguments.bthreshold
+        self.std = -1  # Used for infering blinking.
+        self.mean = -1  # Used for infering blinking.
+
+        # Hard-code blink inference parameters:
+        #self.mean =
+        #self.blink_threshold =
+
         if config.arguments.markers == False:  # Markerless. -m 0 (default)
             self.place_markers = lambda: None
         else:  # Enables markers to remove artifacts. -m 1
@@ -35,8 +43,7 @@ class Engine:
         self.angle = 0
         self.extractors = []
 
-        self.std = -1  # Used for infering blinking.
-        self.mean = -1  # Used for infering blinking.
+
 
         max_cr_processor = 3
         self.cr_log_stock = [-1] * max_cr_processor
@@ -106,10 +113,11 @@ class Engine:
     def arm(self, width, height, image) -> None:
         self.norm = (width + height) * .003
         self.norm_cr_artefact = int(6 * self.norm)
-
-        self.mean = np.mean(image)
+        if self.mean == -1:
+            self.mean = np.mean(image)
         # self.blink_threshold = 25.1 * np.log(np.var(image)) - 182  # 0.046 * np.var(image) - 68.11
-        self.blink_threshold = 0.046 * np.var(image) - 58
+        if self.blink_threshold == -1:
+            self.blink_threshold = 0.046 * np.var(image) - 58
 
         self.base_mean = -1
         self.blink = 0
@@ -136,6 +144,7 @@ class Engine:
         if threshold is None:
             threshold = self.blink_threshold
             # print(f"threshold = {threshold}")
+
         mean = np.mean(self.source)
         delta = self.mean - mean
         self.mean = mean

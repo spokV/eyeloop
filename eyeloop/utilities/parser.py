@@ -4,7 +4,6 @@ from tkinter import filedialog
 import numpy as np
 from eyeloop.extractors.converter import Conversion_extractor
 
-
 class Parser():
     data = []
     file_path = ""
@@ -19,7 +18,7 @@ class Parser():
         try:
             file = open(file_path, "r")
         except FileNotFoundError:
-            print("Please select a valid log.")
+            raise ValueError("Please select a valid log.")
         self.file_path = file_path
 
         for line in file.readlines():
@@ -59,10 +58,30 @@ class Parser():
         try:
             import pandas as pd
         except:
-            print("Please make sure that pandas is installed (pip install pandas).")
+            raise Exception("Please make sure that pandas is installed (pip install pandas).")
 
         file = pd.read_json(self.file_path, lines=True)
         new_path = self.file_path + "_csv"
         file.to_csv(new_path, index=None)
         print("Json succesfully converted to csv.")
         print("Csv saved at {}".format(new_path))
+
+
+    def legacy_to_modern(self):
+        mod_path = self.file_path + "_mod"
+
+        if "cr_dim" in self.data[0]: #Legacy 2
+            with open(mod_path, "a") as datalog:
+                for i, entry in enumerate(self.data):
+                    #{"time": 1590337139.0425687, "frame": 12, "blink": -1, "cr_dim": [-1, -1], "cr_cen": -1, "cr_ang": -1, "pupil_dim": [-1, -1], "pupil_cen": -1, "pupil_ang": -1}
+
+                    dataout = {
+                        "time": entry["time"],
+                        "frame": entry["frame"],
+                        "blink": entry["blink"],
+                        "cr": (entry["cr_dim"], entry["cr_cen"], entry["cr_ang"]),
+                        "pupil": (entry["pupil_dim"], entry["pupil_cen"], entry["pupil_ang"])
+                    }
+
+                    datalog.write(json.dumps(dataout) + "\n")
+        print("Legacy log converted to modern.")
