@@ -7,6 +7,7 @@ import eyeloop.config as config
 from eyeloop.engine.engine import Engine
 from eyeloop.extractors.DAQ import DAQ_extractor
 from eyeloop.extractors.frametimer import FPS_extractor
+from eyeloop.extractors.close_loop_shai import ClosedLoop_shai_Extractor
 from eyeloop.guis.minimum.minimum_gui import GUI
 from eyeloop.utilities.argument_parser import Arguments
 from eyeloop.utilities.file_manager import File_Manager
@@ -40,8 +41,9 @@ class EyeLoop:
 
         fps_counter = FPS_extractor()
         data_acquisition = DAQ_extractor(config.file_manager.new_folderpath)
+        close_loop_shai = ClosedLoop_shai_Extractor()
 
-        extractors = [fps_counter, data_acquisition]
+        extractors = [fps_counter, data_acquisition, close_loop_shai]
         config.engine.load_extractors(extractors)
 
         try:

@@ -14,6 +14,7 @@ import struct
 import time
 import zlib
 
+
 class GUI:
     def __init__(self) -> None:
 
@@ -27,24 +28,26 @@ class GUI:
         self.inquiry = "none"
         self.terminate = -1
 
+        """
         self.gui_data = b""
         self.gui_data_payload_size = struct.calcsize(">iii")
-
+        
         print("Connecting to gui server\n")
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(('192.168.1.196', 8485))
         self.connection = self.client_socket.makefile('wb')
         self.client_socket.settimeout(0.2)
         self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+        """
 
-    def send_frame_with_context(self, frame_np, context):
-        result, frame = cv2.imencode('.jpg', frame_np, self.encode_param)
-        data = pickle.dumps(frame, 0)
-        size = len(data)
-        try:
-            self.client_socket.sendall(struct.pack(">LI", size, context) + data)
-        except socket.timeout:
-            pass
+    # def send_frame_with_context(self, frame_np, context):
+    #    result, frame = cv2.imencode('.jpg', frame_np, self.encode_param)
+    #    data = pickle.dumps(frame, 0)
+    #    size = len(data)
+    #    try:
+    #        self.client_socket.sendall(struct.pack(">LI", size, context) + data)
+    #    except socket.timeout:
+    #        pass
 
     def tip_mousecallback(self, event, x: int, y: int, flags, params) -> None:
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -69,11 +72,11 @@ class GUI:
 
     def update_tool_tip(self, index: int, error: bool = False) -> None:
         if error:
-            #cv2.imshow("Tool tip", self.tool_tips[index + 4])
-            self.send_frame_with_context(self.tool_tips[index + 4], 4)
+            cv2.imshow("Tool tip", self.tool_tips[index + 4])
+            # self.send_frame_with_context(self.tool_tips[index + 4], 4)
         else:
-            #cv2.imshow("Tool tip", self.tool_tips[index - 1])
-            self.send_frame_with_context(self.tool_tips[index - 1], 4)
+            cv2.imshow("Tool tip", self.tool_tips[index - 1])
+            # self.send_frame_with_context(self.tool_tips[index - 1], 4)
 
     def key_listener(self, key: int) -> None:
         try:
@@ -84,15 +87,14 @@ class GUI:
         if self.inquiry == "track":
             if "y" == key:
                 print("Initiating tracking..")
-                #self.remove_mousecallback()
-                
-                #cv2.destroyWindow("CONFIGURATION")
-                #cv2.destroyWindow("BINARY")
-                #cv2.destroyWindow("Tool tip")
+                self.remove_mousecallback()
+                cv2.destroyWindow("CONFIGURATION")
+                cv2.destroyWindow("BINARY")
+                cv2.destroyWindow("Tool tip")
 
-                #cv2.imshow("TRACKING", self.PStock)
-                #cv2.moveWindow("TRACKING", 100, 100)
-                self.send_frame_with_context(self.PStock, 2)
+                cv2.imshow("TRACKING", self.PStock)
+                cv2.moveWindow("TRACKING", 100, 100)
+                # self.send_frame_with_context(self.PStock, 2)
 
                 self._state = "tracking"
                 self.inquiry = "none"
@@ -195,7 +197,7 @@ class GUI:
             elif "z" == key:
                 print("Start tracking? (y/n)")
                 self.inquiry = "track"
-                self.client_socket.settimeout(0.001)
+                # self.client_socket.settimeout(0.001)
 
             elif "w" == key:
 
@@ -279,23 +281,23 @@ class GUI:
         cv2.putText(self.crstock_txt, 'CR | W/S | E/D || bin/blur', (10, 15), font, .7, 1, 0, cv2.LINE_4)
         cv2.putText(self.crstock_txt_selected, '(*) CR | W/S | E/D || bin/blur', (10, 15), font, .7, 1, 0, cv2.LINE_4)
 
-        #cv2.imshow("CONFIGURATION", np.hstack((self.PStock, self.PStock)))
-        self.send_frame_with_context(np.hstack((self.PStock, self.PStock)), 0)
-        #cv2.imshow("BINARY", np.vstack((self.PStock, self.PStock)))
-        self.send_frame_with_context(np.vstack((self.PStock, self.PStock)), 1)
+        cv2.imshow("CONFIGURATION", np.hstack((self.PStock, self.PStock)))
+        # self.send_frame_with_context(np.hstack((self.PStock, self.PStock)), 0)
+        cv2.imshow("BINARY", np.vstack((self.PStock, self.PStock)))
+        # self.send_frame_with_context(np.vstack((self.PStock, self.PStock)), 1)
 
-        #cv2.moveWindow("BINARY", 105 + width * 2, 100)
-        #cv2.moveWindow("CONFIGURATION", 100, 100)
+        cv2.moveWindow("BINARY", 105 + width * 2, 100)
+        cv2.moveWindow("CONFIGURATION", 100, 100)
 
-        #cv2.imshow("Tool tip", self.first_tool_tip)
-        self.send_frame_with_context(self.first_tool_tip, 4)
+        cv2.imshow("Tool tip", self.first_tool_tip)
+        # self.send_frame_with_context(self.first_tool_tip, 4)
 
-        #cv2.moveWindow("Tool tip", 100, 100 + height + 100)
-        #try:
-        #    cv2.setMouseCallback("CONFIGURATION", self.mousecallback)
-        #    cv2.setMouseCallback("Tool tip", self.tip_mousecallback)
-        #except:
-        #    print("Could not bind mouse-buttons.")
+        cv2.moveWindow("Tool tip", 100, 100 + height + 100)
+        try:
+            cv2.setMouseCallback("CONFIGURATION", self.mousecallback)
+            cv2.setMouseCallback("Tool tip", self.tip_mousecallback)
+        except:
+            print("Could not bind mouse-buttons.")
 
     def place_cross(self, source: np.ndarray, point: tuple, color: tuple) -> None:
         try:
@@ -316,8 +318,8 @@ class GUI:
                     break
 
     def update_record(self, frame_preview) -> None:
-        #cv2.imshow("Recording", frame_preview)
-        self.send_frame_with_context(frame_preview, 3)
+        cv2.imshow("Recording", frame_preview)
+        # self.send_frame_with_context(frame_preview, 3)
         if cv2.waitKey(1) == ord('q'):
             config.engine.release()
 
@@ -416,13 +418,13 @@ class GUI:
                     100, 100, 100)
                 i += 1
 
-            #cv2.imshow("CONFIGURATION", np.hstack((frame_source, frame_preview)))
-            self.send_frame_with_context(np.hstack((frame_source, frame_preview)), 0)
-            #cv2.imshow("BINARY", np.vstack((stock_P, stock_CR)))
-            self.send_frame_with_context(np.vstack((stock_P, stock_CR)), 1)
+            cv2.imshow("CONFIGURATION", np.hstack((frame_source, frame_preview)))
+            # self.send_frame_with_context(np.hstack((frame_source, frame_preview)), 0)
+            cv2.imshow("BINARY", np.vstack((stock_P, stock_CR)))
+            # self.send_frame_with_context(np.vstack((stock_P, stock_CR)), 1)
 
             self.out.write(frame_preview)
-            
+            """
             try:
                 self.gui_data = self.client_socket.recv(20)
                 meta = self.gui_data[:self.gui_data_payload_size]
@@ -432,24 +434,25 @@ class GUI:
                 print(int(remote_key), x, y)
                 self.key_listener(remote_key)
             except socket.timeout:
-                #print('timeout')
+                # print('timeout')
                 pass
             if not self.gui_data:
-                #print('empty')
+                # print('empty')
                 pass
-            #self.key = cv2.waitKey(50)
+            """
+            self.key = cv2.waitKey(50)
 
-            #if self.key == ord("-"):
-            #    cv2.imwrite("screen_cap_fr{}.jpg".format(config.importer.frame), frame_preview)
+            if self.key == ord("-"):
+               cv2.imwrite("screen_cap_fr{}.jpg".format(config.importer.frame), frame_preview)
 
-            #self.key_listener(self.key)
+            self.key_listener(self.key)
 
         else:
             # real tracking
             self.out.write(frame_preview)
 
-            #cv2.imshow("TRACKING", frame_preview)
-            self.send_frame_with_context(frame_preview, 2)
+            cv2.imshow("TRACKING", frame_preview)
+            # self.send_frame_with_context(frame_preview, 2)
 
             key = cv2.waitKey(1)
 

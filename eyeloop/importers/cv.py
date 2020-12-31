@@ -21,7 +21,7 @@ class Importer(IMPORTER):
         # load first frame
         if str(self.vid_path.name) == "0" or self.vid_path.is_file():  # or stream
             if str(self.vid_path.name) == "0":
-                self.capture = cv2.VideoCapture(1)
+                self.capture = cv2.VideoCapture(0)
             else:
                 self.capture = cv2.VideoCapture(str(self.vid_path))
 
